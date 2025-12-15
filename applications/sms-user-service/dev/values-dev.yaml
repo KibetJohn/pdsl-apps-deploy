@@ -12,6 +12,7 @@ image:
   repository: harbor.pdslkenya.com:80/pdsl
   tag: latest
   pullPolicy: IfNotPresent
+  secrets: harbor-secret
 
 #securityContext
 securityContext:

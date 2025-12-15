@@ -74,7 +74,8 @@ spec:
       {{- end }}
       {{- if .Values.image.secrets }}
       imagePullSecrets:
-{{ toYaml .Values.image.secrets | indent 8 }}
+        - name: {{ .Values.image.secrets }}
+#{{ toYaml .Values.image.secrets | indent 8 }}
       {{- end }}
       containers:
         - name: "{{ .Release.Name }}"
