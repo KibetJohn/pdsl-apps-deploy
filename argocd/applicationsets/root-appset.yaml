@@ -1,0 +1,51 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: pdsl-root-appset
+  namespace: argocd
+spec:
+  generators:
+  - list:
+      elements:
+      - app: sms-api-gateway-service
+        env: dev
+      - app: sms-audit-service
+        env: dev
+      - app: sms-auth-service
+        env: dev
+      - app: sms-compliance-service
+        env: dev
+      - app: sms-contacts-service
+        env: dev
+      - app: sms-message-template-service
+        env: dev
+      - app: sms-messaging-service
+        env: dev
+      - app: sms-payment-service
+        env: dev
+      - app: sms-subscription-pricing-plan-service
+        env: dev
+      - app: sms-user-service
+        env: dev
+  template:
+    metadata:
+      name: '{{app}}-{{env}}'
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: pdsl-dev-project
+      source:
+        repoURL: https://github.com/KibetJohn/pdsl-apps-deploy.git
+        targetRevision: main
+        path: applications/{{app}}/{{env}}
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{env}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - PrunePropagationPolicy=foreground
+          - PruneLast=true

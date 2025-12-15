@@ -1,0 +1,318 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pdsl-app.fullname" . }}
+  labels:
+    app: {{ include "pdsl-app.name" . }}
+    chart: {{ include "pdsl-app.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    {{- include "pdsl-app.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.hpav2.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "pdsl-app.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        {{- include "pdsl-app.labels" . | nindent 8 }}
+      annotations:
+        {{- if .Values.iamRole }}
+        iam.amazonaws.com/role: "{{ .Values.iamRole }}"
+        {{- end }}
+        {{- if .Values.opentelemetry.enabled }}
+          {{- if and .Values.opentelemetry.injectJava (not .Values.opentelemetry.injectPython) (not .Values.opentelemetry.injectNodejs) }}
+        instrumentation.opentelemetry.io/inject-java: "true"
+          {{- else if and .Values.opentelemetry.injectPython (not .Values.opentelemetry.injectJava) (not .Values.opentelemetry.injectNodejs) }}
+        instrumentation.opentelemetry.io/inject-python: "true"
+          {{- else if and .Values.opentelemetry.injectNodejs (not .Values.opentelemetry.injectJava) (not .Values.opentelemetry.injectPython) }}
+        instrumentation.opentelemetry.io/inject-nodejs: "true"
+          {{ else if and .Values.opentelemetry.injectPython .Values.opentelemetry.injectJava .Values.opentelemetry.injectNodejs }}
+          {{- fail "Can not use multiple injectors on the same deployment" }}
+        {{- end}}
+        instrumentation.opentelemetry.io/container-names: "{{ .Release.Name }}"
+        {{- end }}
+    spec:
+{{- if .Values.specExtras }}
+{{ toYaml .Values.specExtras | indent 6 }}
+{{- end }}
+      {{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ include "pdsl-app.serviceAccountName" . }}
+      {{- end }}
+      {{- if .Values.securityContext.enabled }}
+      securityContext:
+        fsGroup: {{ .Values.securityContext.fsGroup }}
+      {{- end }}
+      volumes:
+      {{- if .Values.emptyDir }}
+        - name: {{ .Values.emptyDir.name }}
+          emptyDir: {}
+      {{- end }}
+      {{- if .Values.persistence.enabled }}
+        - name: {{ .Values.persistence.name  }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim }}
+      {{- end }}
+      {{- if .Values.persistenceData.enabled }}
+        - name: {{ .Values.persistenceData.name  }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistenceData.existingClaim }}
+      {{- end }}
+      {{- range $volume := .Values.configmapVolumes }}
+        - name: {{ $volume.name }}
+          configMap:
+            name: {{ $volume.name }}
+      {{- end }}
+      {{- range $volume := .Values.secretVolumes }}
+        - name: {{ $volume.name }}
+          secret:
+            secretName: {{ $volume.name }}
+      {{- end }}
+      {{- if .Values.image.secrets }}
+      imagePullSecrets:
+{{ toYaml .Values.image.secrets | indent 8 }}
+      {{- end }}
+      containers:
+        - name: "{{ .Release.Name }}"
+          image: "{{ .Values.image.repository }}/{{ include "pdsl-app.fullname" . }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.securityContext.enabled }}
+          securityContext:
+            runAsUser: {{ .Values.securityContext.runAsUser }}
+            runAsNonRoot: {{ .Values.securityContext.runAsNonRoot }}
+            capabilities: {{ .Values.securityContext.capabilities }}
+            allowPrivilegeEscalation: {{ .Values.securityContext.allowPrivilegeEscalation }}
+            readOnlyRootFilesystem: {{ .Values.securityContext.readOnlyRootFilesystem }}
+        {{- end }}
+          ports:
+           - name: app
+             containerPort: {{ .Values.containerPort }}
+             protocol: TCP
+          {{- if .Values.service.admin }}
+           - name: admin
+             containerPort: {{ .Values.adminPort }}
+             protocol: TCP
+          {{- end }}
+          {{- if .Values.service.https }}
+           - name: https
+             containerPort: {{ .Values.httpsPort }}
+             protocol: TCP
+          {{- end }}
+          {{- range $key, $value := .Values.extraTCPPorts }}
+           - name: {{ $key }}
+             containerPort: {{ $value }}
+             protocol: TCP
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.livenessProbe.path }}
+              port:  {{ .Values.livenessProbe.port }}
+            initialDelaySeconds:  {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds:  {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds:  {{ .Values.livenessProbe.timeoutSeconds }}
+          readinessProbe:
+            httpGet:
+              path:  {{ .Values.readinessProbe.path }}
+              port: {{ .Values.readinessProbe.port }}
+            initialDelaySeconds:  {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          {{- if .Values.cliHealthCheck.enabled }}
+          livenessProbe:
+            exec:
+              command:
+              {{- range .Values.cliHealthCheck.command }}
+                - "{{ . }}"
+              {{- end }}
+            initialDelaySeconds:  {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds:  {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds:  {{ .Values.livenessProbe.timeoutSeconds }}
+          readinessProbe:
+            exec:
+              command:
+              {{- range .Values.cliHealthCheck.command }}
+                - "{{ . }}"
+              {{- end }}
+            initialDelaySeconds:  {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          {{- end }}
+          volumeMounts:
+{{- if .Values.emptyDir }}
+{{ toYaml .Values.emptyDir.mounts | indent 12 }}
+{{- end }}
+{{- if .Values.persistence.mounts }}
+{{ toYaml .Values.persistence.mounts | indent 12 }}
+{{- end }}
+{{- if .Values.persistenceData.mounts }}
+{{ toYaml .Values.persistenceData.mounts | indent 12 }}
+{{- end }}
+            {{- range $volume := .Values.configmapVolumes }}
+            - name: {{ $volume.name }}
+              mountPath: {{ $volume.mountPath }}
+              subPath: {{ $volume.subPath | default "" }}
+            {{- end }}
+            {{- range $volume := .Values.secretVolumes }}
+            - name: {{ $volume.name }}
+              mountPath: {{ $volume.mountPath }}
+              subPath: {{ $volume.subPath | default "" }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+          {{- range $key, $value := .Values.env }}
+            - name: "{{ $key }}"
+              value: "{{ $value }}"
+          {{- end }}
+          {{- range $key, $value := .Values.secretEnv }}
+            - name: {{ $key }}
+              valueFrom:
+                secretKeyRef:
+          {{- range $k, $v := $value }}
+                  {{ $k }}: {{ $v }}
+          {{- end}}
+          {{- end }}
+          {{- if .Values.java_opts }}
+            - name: JAVA_OPTS
+              value: {{ .Values.java_opts }}
+          {{- end }}
+{{- if .Values.sidecarContainers }}
+        - name: "{{ .Values.sidecarContainers.image.name }}"
+          image: "{{ .Values.sidecarContainers.image.repository }}:{{ .Values.sidecarContainers.image.tag }}"
+          imagePullPolicy: {{ .Values.sidecarContainers.image.pullPolicy }}
+          {{- if .Values.sidecarContainers.securityContext }}
+          securityContext:
+            runAsUser: {{ .Values.sidecarContainers.securityContext.runAsUser }}
+            runAsNonRoot: {{ .Values.sidecarContainers.securityContext.runAsNonRoot }}
+            capabilities: {{ .Values.sidecarContainers.securityContext.capabilities }}
+            allowPrivilegeEscalation: {{ .Values.sidecarContainers.securityContext.allowPrivilegeEscalation }}
+            readOnlyRootFilesystem: {{ .Values.sidecarContainers.securityContext.readOnlyRootFilesystem }}
+        {{- end }}
+        {{- if .Values.sidecarContainers.ports }}
+          ports:
+           {{- if .Values.sidecarContainers.containerPort }}
+           - name: app
+             containerPort: {{ .Values.sidecarContainers.containerPort }}
+             protocol: TCP
+           {{- end }}
+          {{- range $key, $value := .Values.sidecarContainers.extraTCPPorts }}
+           - name: {{ $key }}
+             containerPort: {{ $value }}
+             protocol: TCP
+          {{- end }}
+          {{ end }}
+          {{- if .Values.sidecarContainers.httpHealthCheck }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.sidecarContainers.livenessProbe.path }}
+              port:  {{ .Values.sidecarContainers.livenessProbe.port }}
+            initialDelaySeconds:  {{ .Values.sidecarContainers.livenessProbe.initialDelaySeconds }}
+            periodSeconds:  {{ .Values.sidecarContainers.livenessProbe.periodSeconds }}
+            timeoutSeconds:  {{ .Values.sidecarContainers.livenessProbe.timeoutSeconds }}
+          readinessProbe:
+            httpGet:
+              path:  {{ .Values.sidecarContainers.readinessProbe.path }}
+              port: {{ .Values.sidecarContainers.readinessProbe.port }}
+            initialDelaySeconds:  {{ .Values.sidecarContainers.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.sidecarContainers.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.sidecarContainers.readinessProbe.timeoutSeconds }}
+          {{ end }}
+          volumeMounts:
+{{- if .Values.sidecarContainers.emptyDir }}
+{{ toYaml .Values.sidecarContainers.emptyDir.mounts | indent 12 }}
+{{- end }}
+{{- if .Values.sidecarContainers.persistence.mounts }}
+{{ toYaml .Values.sidecarContainers.persistence.mounts | indent 12 }}
+{{- end }}
+{{- if .Values.sidecarContainers.persistenceData.mounts }}
+{{ toYaml .Values.sidecarContainers.persistenceData.mounts | indent 12 }}
+{{- end }}
+            {{- range $volume := .Values.sidecarContainers.configmapVolumes }}
+            - name: {{ $volume.name }}
+              mountPath: {{ $volume.mountPath }}
+              subPath: {{ $volume.subPath | default "" }}
+            {{- end }}
+            {{- range $volume := .Values.sidecarContainers.secretVolumes }}
+            - name: {{ $volume.name }}
+              mountPath: {{ $volume.mountPath }}
+              subPath: {{ $volume.subPath | default "" }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+          {{- range $key, $value := .Values.sidecarContainers.env }}
+            - name: "{{ $key }}"
+              value: "{{ $value }}"
+          {{- end }}
+          {{- range $key, $value := .Values.sidecarContainers.secretEnv }}
+            - name: {{ $key }}
+              valueFrom:
+                secretKeyRef:
+          {{- range $k, $v := $value }}
+                  {{ $k }}: {{ $v }}
+          {{- end}}
+          {{- end }}
+          {{- if .Values.sidecarContainers.cliHealthCheck }}
+          livenessProbe:
+            exec:
+              command:
+              {{- range .Values.sidecarContainers.cliHealthCheck.command }}
+                - "{{ . }}"
+              {{- end }}
+            initialDelaySeconds:  {{ .Values.sidecarContainers.livenessProbe.initialDelaySeconds }}
+            periodSeconds:  {{ .Values.sidecarContainers.livenessProbe.periodSeconds }}
+            timeoutSeconds:  {{ .Values.sidecarContainers.livenessProbe.timeoutSeconds }}
+          readinessProbe:
+            exec:
+              command:
+              {{- range .Values.sidecarContainers.cliHealthCheck.command }}
+                - "{{ . }}"
+              {{- end }}
+            initialDelaySeconds:  {{ .Values.sidecarContainers.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.sidecarContainers.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.sidecarContainers.readinessProbe.timeoutSeconds }}
+          {{- end }}
+{{- end }}
+{{- if .Values.initContainers }}
+      initContainers:
+{{ toYaml .Values.initContainers | indent 8 }}
+{{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if or .Values.antiAffinity .Values.nodeAffinity }}
+      affinity:
+      {{- end }}
+      {{- if eq .Values.antiAffinity "hard" }}
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: "kubernetes.io/hostname"
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: {{ include "pdsl-app.name" . }}
+      {{- else if eq .Values.antiAffinity "soft" }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            podAffinityTerm:
+              topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: {{ include "pdsl-app.name" . }}
+      {{- end }}
+      {{- with .Values.nodeAffinity }}
+        nodeAffinity:
+{{ toYaml . | indent 10 }}
+      {{- end }}
+      {{- if .Values.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

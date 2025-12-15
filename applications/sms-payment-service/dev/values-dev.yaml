@@ -1,0 +1,203 @@
+# PDSL-APP Helm chart
+# This is just a sample implementation
+
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+# helm upgrade -i --debug atlas-pdsl-app ./shared/helm-charts/pdsl-app --set 'image.tag=development-08a1c9c928' '--namespace=dev' -f ./shared/helm-charts/pdsl-app/values.yaml
+nameOverride: "sms-payment-service"
+fullnameOverride: "sms-payment-service"
+
+# Docker specifics
+image:
+  repository: harbor.pdslkenya.com:80/pdsl
+  tag: latest
+  pullPolicy: IfNotPresent
+
+#securityContext
+securityContext:
+  enabled: true
+  allowPrivilegeEscalation: false
+  fsGroup: 10001
+  runAsUser: 10001
+  runAsNonRoot: true
+  readOnlyRootFilesystem: false
+# PVC Claim
+persistence:
+  name: dev-certs-efs
+  enabled: false
+
+#DB Migrations
+application:
+  enabled: false
+
+#Disable PVC Documents Mount
+persistenceData:
+  enabled: false
+
+# serviceAccount
+serviceAccount:
+  create: false
+  rbac:
+    - apiGroups: ["networking.istio.io"]
+      resources: 
+        - "virtualservices"
+      verbs: ["get", "update", "patch", "create"]
+
+# Scalability and Stability
+replicaCount: 1
+#maxReplicaCount: 5
+
+#Prometheus and ServiceMonitor
+prometheus:
+  enabled: false
+
+# OpenTelemetry Java or Python agent injection
+opentelemetry:
+  enabled: false
+  injectJava: false
+  injectPython: false
+  injectNodejs: false
+
+hpav2:
+  enabled: false
+
+  relabelings: []
+  #- replacement: $1
+  #  sourceLabels:
+  #  - endpoint
+  #  targetLabel: email_to
+
+scalingMetrics:
+  targetCPUUtilizationPercentage: 90
+
+scalingMetricsMemory:
+  targetMemoryUtilization: 400Mi
+
+maxUnavailablePods: 25%
+
+# Healthchecks
+livenessProbe:
+  path: /
+  port: 8080
+  initialDelaySeconds: 120
+  periodSeconds: 300
+  timeoutSeconds: 300
+
+readinessProbe:
+  path: /
+  port: 8080
+  initialDelaySeconds: 120
+  periodSeconds: 300
+  timeoutSeconds: 300
+    
+#cliHealthCheck
+cliHealthCheck:
+  enabled: false
+
+# Environment
+environmentShort: dev
+environmentFull: development
+
+# Container endpoints
+containerPort: 8080
+adminPort: 8081
+
+# Services endpoints
+service:
+  port: 80
+  type: ClusterIP
+#  annotations:
+#    service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
+
+# Ingress endpoints
+ingress:
+  enabled: false
+  annotations:
+    {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: auth.local
+      paths: [/path,/path2]
+  port: 80
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+# Resources requirements
+resources:
+  {}
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+nodeAffinity: {}
+  # requiredDuringSchedulingIgnoredDuringExecution:
+  #   nodeSelectorTerms:
+  #   - matchExpressions:
+  #     - key: failure-domain.beta.kubernetes.io/zone
+  #       operator: In
+  #       values:
+  #         - us-west-1a
+  
+# value can be required or soft for antiAffinity. default is set to soft
+# please refer for more details https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
+antiAffinity: "soft"
+  
+
+# Specifc App IAM Role
+#iamRole: arn:aws:iam::112991787507:role/k8s-dev-comms
+
+# Environment Variables
+env:
+  app__test__value: "testvalue"
+
+# Secrets exposed and Environment Variables
+secretEnv:
+  apppdsl__cassandra__authProvider__username:
+    name: apppdsl-cassandra-secret
+    key: username
+  apppdsl__cassandra__authProvider__password:
+    name: apppdsl-cassandra-secret
+    key: password
+
+
+emptyDir:
+  enabled: false
+
+scaleDown:
+  stabilizationWindowSeconds: 900
+  periodSeconds: 15
+  podsCount: 1
+  #selectPolicy: Max
+  #podPercent: 100
+
+scaleUp:
+  stabilizationWindowSeconds: 0
+  periodSeconds: 15
+  podsCount: 4
+  #selectPolicy: Max
+  #podPercent: 100
+
+#Set true or false for scaling behaviour needed for the country this helm chart values are for.
+#This should be set true only if the kubernetes cluster version is >= 1.18
+scalingBehaviour: true
+
+#Enabled hpav2
+hpav2:
+  enabled: false 
+
+serviceAccount:
+  create: false
+  rbac: 
+    - apiGroups: ["networking.istio.io"]
+      resources: ["virtualservices"]
+      verbs: ["get", "update", "patch", "create"]

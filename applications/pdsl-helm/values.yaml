@@ -1,0 +1,73 @@
+# Default values for pdsl-app.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+# For more information related to this file visit: https://helm.sh/docs/chart_template_guide/values_files/
+
+# Common
+image:
+  pullPolicy: IfNotPresent
+  secrets: []
+env: {}
+secretEnv: {}
+java_opts: ""
+tolerations: []
+
+# Data & Storage
+persistence:
+  enabled: false
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  storageClass: "-"
+persistenceData:
+  enabled: false
+application:
+  enabled: false
+
+# Health checks
+livenessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+readinessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5
+cliHealthCheck:
+  enabled: false
+  command: []
+
+# Observability
+opentelemetry:
+  enabled: false
+prometheus:
+  enabled: false
+  interval: 15s
+AlertsLists: []
+Alerts: {}
+
+# Network Access & Security
+securityContext:
+  enabled: false
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+serviceAccount:
+  create: false
+  rbac: 
+    - apiGroups: ["networking.istio.io"]
+      resources: ["virtualservices"]
+      verbs: ["get", "update", "patch", "create"]
+service:
+  admin: false
+ingress:
+  enabled: false
+
+# Scalability & Stability
+antiAffinity: "soft"
+terminationGracePeriodSeconds: 30
+hpav2:
+  enabled: false
+replicaCount: 1
+maxUnavailablePods: 25%
+scalingBehaviour: false

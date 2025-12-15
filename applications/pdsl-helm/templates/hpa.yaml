@@ -1,0 +1,70 @@
+{{- if gt (.Values.maxReplicaCount | int) (.Values.replicaCount | int) }}
+{{- if and (.Capabilities.APIVersions.Has "autoscaling/v2beta2") (.Values.hpav2.enabled) }}
+apiVersion: autoscaling/v2beta2
+{{ else }}
+apiVersion: autoscaling/v1
+{{ end -}}
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app: {{ include "pdsl-app.name" . }}
+    chart: {{ include "pdsl-app.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  name: {{ include "pdsl-app.fullname" . }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "pdsl-app.fullname" . }}
+  maxReplicas: {{ .Values.maxReplicaCount }}
+  minReplicas: {{ .Values.replicaCount }}
+{{- if and (.Values.scalingBehaviour) (.Values.hpav2.enabled) }}
+  behavior: 
+    scaleDown:
+      stabilizationWindowSeconds: {{ .Values.scaleDown.stabilizationWindowSeconds }}
+      policies:
+      {{- if .Values.scaleDown.podPercent }}
+      - type: Percent
+        value: {{ .Values.scaleDown.podPercent }}
+        periodSeconds: {{ .Values.scaleDown.periodSeconds }}
+      {{- end }}
+      - type: Pods
+        value: {{ .Values.scaleDown.podsCount }}
+        periodSeconds: {{ .Values.scaleDown.periodSeconds }}
+      {{- if .Values.scaleDown.selectPolicy }}
+      selectPolicy: {{ .Values.scaleDown.selectPolicy }}
+      {{- end }}
+    scaleUp:
+      stabilizationWindowSeconds: {{ .Values.scaleUp.stabilizationWindowSeconds }}
+      policies:
+      {{- if .Values.scaleUp.podPercent }}
+      - type: Percent
+        value: {{ .Values.scaleUp.podPercent }}
+        periodSeconds: {{ .Values.scaleUp.periodSeconds }}
+      {{- end }}
+      - type: Pods
+        value: {{ .Values.scaleUp.podsCount }}
+        periodSeconds: {{ .Values.scaleUp.periodSeconds }}
+      {{- if .Values.scaleUp.selectPolicy }}
+      selectPolicy: {{ .Values.scaleUp.selectPolicy }}
+      {{- end }}
+{{ end -}}
+{{- if .Values.hpav2.enabled }}
+  metrics:
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.scalingMetricsMemory.targetMemoryUtilization }}
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.scalingMetrics.targetCPUUtilizationPercentage }}
+{{ else }}
+  targetCPUUtilizationPercentage: {{ .Values.scalingMetrics.targetCPUUtilizationPercentage }}
+{{- end }}
+{{- end }}
