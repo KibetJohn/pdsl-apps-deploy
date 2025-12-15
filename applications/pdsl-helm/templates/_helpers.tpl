@@ -36,9 +36,9 @@ Selector Labels
 */}}
 {{- define "pdsl-app.selectorLabels" -}}
 app.kubernetes.io/version: {{ .Values.image.tag }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-app.kubernetes.io/name: {{ include "pdsl-app.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+app.kubernetes.io/name: {{ include "pdsl-app.name" . | quote }}
+app.kubernetes.io/instance: {{ .Release.Name | quote }}
 {{- end -}}
 
 {{/*
