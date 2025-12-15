@@ -1,9 +1,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 helmGlobals:
-  chartHome: ../../pdsl-helm
+  chartHome: ../../
 helmCharts:
-  - name: sms-auth-service-dev
+  - name: pdsl-helm
     releaseName: sms-auth-service
     valuesFile: values-dev.yaml
     namespace: dev
