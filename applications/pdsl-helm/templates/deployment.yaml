@@ -48,7 +48,7 @@ spec:
         fsGroup: {{ .Values.securityContext.fsGroup }}
       {{- end }}
       volumes:
-      {{- if .Values.emptyDir }}
+      {{- if .Values.emptyDir.enabled }}
         - name: {{ .Values.emptyDir.name }}
           emptyDir: {}
       {{- end }}
