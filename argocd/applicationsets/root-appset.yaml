@@ -7,33 +7,33 @@ spec:
   generators:
   - list:
       elements:
-      - app: sms-api-gateway-service
-        env: dev
-      - app: sms-audit-service
-        env: dev
+#      - app: sms-api-gateway-service
+#        env: dev
+#      - app: sms-audit-service
+#        env: dev
       - app: sms-auth-service
         env: dev
-      - app: sms-compliance-service
-        env: dev
-      - app: sms-contacts-service
-        env: dev
-      - app: sms-message-template-service
-        env: dev
-      - app: sms-messaging-service
-        env: dev
-      - app: sms-payment-service
-        env: dev
-      - app: sms-subscription-pricing-plan-service
-        env: dev
-      - app: sms-user-service
-        env: dev
+#      - app: sms-compliance-service
+#        env: dev
+#      - app: sms-contacts-service
+#        env: dev
+#      - app: sms-message-template-service
+#        env: dev
+#      - app: sms-messaging-service
+#        env: dev
+#      - app: sms-payment-service
+#        env: dev
+#      - app: sms-subscription-pricing-plan-service
+#        env: dev
+#      - app: sms-user-service
+#        env: dev
   template:
     metadata:
       name: '{{app}}-{{env}}'
       finalizers:
         - resources-finalizer.argocd.argoproj.io
     spec:
-      project: pdsl-dev-project
+      project: default
       source:
         repoURL: https://github.com/KibetJohn/pdsl-apps-deploy.git
         targetRevision: main
