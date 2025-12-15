@@ -5,8 +5,8 @@ metadata:
   labels:
     app: {{ include "pdsl-app.name" . }}
     chart: {{ include "pdsl-app.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
 {{- if .Values.service.annotations }}
   annotations:
 {{ toYaml .Values.service.annotations | indent 4 }}
@@ -51,5 +51,5 @@ spec:
       name: {{ $key }}
     {{- end }}
   selector:
-    app.kubernetes.io/name: {{ include "pdsl-app.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/name: {{ include "pdsl-app.name" . | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
