@@ -77,7 +77,7 @@ scalingMetricsMemory:
 maxUnavailablePods: 25%
 
 # Healthchecks
-livenessProbe:
+#livenessProbe:
 #  path: /
 #  port: 80
 #  initialDelaySeconds: 120
