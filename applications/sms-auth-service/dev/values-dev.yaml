@@ -78,15 +78,15 @@ maxUnavailablePods: 25%
 
 # Healthchecks
 livenessProbe:
-  path: /
-  port: 80
+#  path: /
+#  port: 80
   initialDelaySeconds: 120
   periodSeconds: 300
   timeoutSeconds: 300
 
 readinessProbe:
-  path: /
-  port: 80
+#  path: /
+#  port: 80
   initialDelaySeconds: 120
   periodSeconds: 300
   timeoutSeconds: 300
