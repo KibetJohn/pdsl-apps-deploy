@@ -80,16 +80,16 @@ maxUnavailablePods: 25%
 livenessProbe:
 #  path: /
 #  port: 80
-  initialDelaySeconds: 120
-  periodSeconds: 300
-  timeoutSeconds: 300
+#  initialDelaySeconds: 120
+#  periodSeconds: 300
+#  timeoutSeconds: 300
 
-readinessProbe:
+#readinessProbe:
 #  path: /
 #  port: 80
-  initialDelaySeconds: 120
-  periodSeconds: 300
-  timeoutSeconds: 300
+#  initialDelaySeconds: 120
+#  periodSeconds: 300
+#  timeoutSeconds: 300
     
 #cliHealthCheck
 cliHealthCheck:
