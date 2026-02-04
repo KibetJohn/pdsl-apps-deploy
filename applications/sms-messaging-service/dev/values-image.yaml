@@ -1,5 +1,5 @@
 image:
   repository: harbor.pdslkenya.com:80/pdsl
-  tag: "7"
+  tag: "8"
   pullPolicy: IfNotPresent
   secrets: harbor-secret
