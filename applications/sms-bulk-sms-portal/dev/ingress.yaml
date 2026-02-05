@@ -1,0 +1,32 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: pdsl-portal-internal-ingress-gw
+  namespace: istio-ingress-int
+spec:
+  selector:
+    istio: ${ARGOCD_ENV_istio_internal_gateway_name}
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*.pdslkenya.com" 
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: bulk-sms-portal
+spec:
+  hosts:
+  - "bulk-sms-portal.pdslkenya.com"
+  gateways:
+  - istio-ingress-int/pdsl-portal-internal-ingress-gw
+  http:
+  - route:
+    - destination:
+        host: sms-bulk-sms-portal.dev.svc.cluster.local
+        port:
+          number: 80
