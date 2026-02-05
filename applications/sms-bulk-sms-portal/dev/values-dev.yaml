@@ -16,7 +16,7 @@ image:
 
 #securityContext
 securityContext:
-  enabled: true
+  enabled: false
   allowPrivilegeEscalation: false
   fsGroup: 10001
   runAsUser: 10001
