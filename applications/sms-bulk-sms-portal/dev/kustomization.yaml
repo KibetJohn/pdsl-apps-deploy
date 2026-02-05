@@ -10,3 +10,4 @@ helmCharts:
     valuesFile: values-dev.yaml
     additionalValuesFiles:
     - values-image.yaml    
+    - ingress.yaml    
