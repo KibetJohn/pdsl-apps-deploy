@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+helmGlobals:
+  chartHome: ../../
+helmCharts:
+  - name: pdsl-helm
+    namespace: dev
+    releaseName: sms-bulk-sms-portal
+    valuesFile: values-dev.yaml
+    additionalValuesFiles:
+    - values-image.yaml    
