@@ -169,6 +169,9 @@ secretEnv:
   DATABASE_PASSWORD:
     name: database-creds
     key: db-password
+  DATABASE_HOST:
+    name: database-creds
+    key: db-host
 
 emptyDir:
   enabled: false
