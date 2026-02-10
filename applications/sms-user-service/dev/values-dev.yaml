@@ -162,14 +162,13 @@ env:
   app__test__value: "testvalue"
 
 # Secrets exposed and Environment Variables
-#secretEnv:
-#  apppdsl__cassandra__authProvider__username:
-#    name: apppdsl-cassandra-secret
-#    key: username
-#  apppdsl__cassandra__authProvider__password:
-#    name: apppdsl-cassandra-secret
-#    key: password
-
+secretEnv:
+  DATABASE_USERNAME:
+    name: database-creds
+    key: db-username
+  DATABASE_PASSWORD:
+    name: database-creds
+    key: db-password
 
 emptyDir:
   enabled: false
