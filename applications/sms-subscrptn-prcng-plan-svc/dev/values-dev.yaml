@@ -100,7 +100,7 @@ environmentShort: dev
 environmentFull: development
 
 # Container endpoints
-containerPort: 8080
+containerPort: 3001
 adminPort: 8081
 
 # Services endpoints
