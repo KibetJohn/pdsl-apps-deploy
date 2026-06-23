@@ -1,5 +1,5 @@
 image:
   repository: harbor.pdslkenya.com:80/pdsl
-  tag: "feature-deployments-17"
+  tag: "feature-deployments-18"
   pullPolicy: IfNotPresent
   secrets: harbor-secret
