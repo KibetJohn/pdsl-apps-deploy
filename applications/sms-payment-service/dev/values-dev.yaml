@@ -16,11 +16,11 @@ image:
 
 #securityContext
 securityContext:
-  enabled: true
-  allowPrivilegeEscalation: false
+  enabled: false
+  allowPrivilegeEscalation: true
   fsGroup: 10001
   runAsUser: 10001
-  runAsNonRoot: true
+  runAsNonRoot: false
   readOnlyRootFilesystem: false
 # PVC Claim
 persistence:
