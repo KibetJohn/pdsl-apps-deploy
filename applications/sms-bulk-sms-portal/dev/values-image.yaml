@@ -1,5 +1,5 @@
 image:
   repository: harbor.pdslkenya.com:80/pdsl
-  tag: "bugfix-angular-env-production-config-6"
+  tag: "bugfix-angular-env-production-config-7"
   pullPolicy: IfNotPresent
   secrets: harbor-secret
