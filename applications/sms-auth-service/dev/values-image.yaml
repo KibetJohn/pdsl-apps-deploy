@@ -1,5 +1,5 @@
 image:
   repository: harbor.pdslkenya.com:80/pdsl
-  tag: "bugfix-auth-service-crypto-key-3"
+  tag: "bugfix-auth-service-crypto-key-4"
   pullPolicy: IfNotPresent
   secrets: harbor-secret
