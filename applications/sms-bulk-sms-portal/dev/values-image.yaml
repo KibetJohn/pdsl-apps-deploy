@@ -1,5 +1,5 @@
 image:
   repository: harbor.pdslkenya.com:80/pdsl
-  tag: "bigfix-groups-and-contacts-2"
+  tag: "feature-admin-actions-2"
   pullPolicy: IfNotPresent
   secrets: harbor-secret
