@@ -1,5 +1,5 @@
 image:
   repository: harbor.pdslkenya.com:80/pdsl
-  tag: "main-10"
+  tag: "bugfix-groups-and-contacts-1"
   pullPolicy: IfNotPresent
   secrets: harbor-secret
