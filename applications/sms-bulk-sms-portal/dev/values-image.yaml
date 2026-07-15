@@ -1,5 +1,5 @@
 image:
   repository: harbor.pdslkenya.com:80/pdsl
-  tag: "bugfix-environment-configuration-5"
+  tag: "bugfix-environment-config-1"
   pullPolicy: IfNotPresent
   secrets: harbor-secret
