@@ -1,5 +1,5 @@
 image:
   repository: harbor.pdslkenya.com:80/pdsl
-  tag: "bugfix-dockerfile-port-3"
+  tag: "bugfix-dockerfile-port-4"
   pullPolicy: IfNotPresent
   secrets: harbor-secret
