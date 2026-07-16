@@ -1,5 +1,5 @@
 image:
   repository: harbor.pdslkenya.com:80/pdsl
-  tag: "deploy-test-cors-3"
+  tag: "deploy-test-cors-4"
   pullPolicy: IfNotPresent
   secrets: harbor-secret
