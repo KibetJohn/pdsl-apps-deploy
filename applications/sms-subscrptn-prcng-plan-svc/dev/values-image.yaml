@@ -1,5 +1,5 @@
 image:
   repository: harbor.pdslkenya.com:80/pdsl
-  tag: "fix-port-issue-in-production-17"
+  tag: "fix-port-issue-in-production-18"
   pullPolicy: IfNotPresent
   secrets: harbor-secret
