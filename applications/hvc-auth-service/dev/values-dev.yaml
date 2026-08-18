@@ -163,16 +163,66 @@ env:
 
 # Secrets exposed and Environment Variables
 secretEnv:
-  DATABASE_USERNAME:
-    name: database-creds
-    key: db-username
-  DATABASE_PASSWORD:
-    name: database-creds
-    key: db-password
-  DATABASE_HOST:
-    name: database-creds
-    key: db-host
-
+  FRONTEND_LOGIN_URL:
+    name: hvc-auth-service-secrets
+    key: FRONTEND_LOGIN_URL
+  KEYCLOAK_ADMIN_CLIENT_ID:
+    name: hvc-auth-service-secrets
+    key: KEYCLOAK_ADMIN_CLIENT_ID
+  KEYCLOAK_ADMIN_CLIENT_SECRET:
+    name: hvc-auth-service-secrets
+    key: KEYCLOAK_ADMIN_CLIENT_SECRET
+  KEYCLOAK_ADMIN_REALM:
+    name: hvc-auth-service-secrets
+    key: KEYCLOAK_ADMIN_REALM
+  KEYCLOAK_ADMIN_URL:
+    name: hvc-auth-service-secrets
+    key: KEYCLOAK_ADMIN_URL
+  KEYCLOAK_ISSUER_URI:
+    name: hvc-auth-service-secrets
+    key: KEYCLOAK_ISSUER_URI
+  MAIL_FROM_ADDRESS:
+    name: hvc-auth-service-secrets   
+    key: MAIL_FROM_ADDRESS
+  PDSL_SMS_PASSWORD:
+    name: hvc-auth-service-secrets
+    key: PDSL_SMS_PASSWORD
+  PDSL_SMS_SENDER_ADDRESS:
+    name: hvc-auth-service-secrets   
+    key: PDSL_SMS_SENDER_ADDRESS
+  PDSL_SMS_SENDER_NAME:
+    name: hvc-auth-service-secrets
+    key: PDSL_SMS_SENDER_NAME
+  PDSL_SMS_SP_ID:
+    name: hvc-auth-service-secrets
+    key: PDSL_SMS_SP_ID
+  PDSL_SMS_URL:
+    name: hvc-auth-service-secrets
+    key: PDSL_SMS_URL
+  POSTGRES_PASSWORD:
+    name: hvc-auth-service-secrets
+    key: POSTGRES_PASSWORD
+  POSTGRES_URL:
+    name: hvc-auth-service-secrets
+    key: POSTGRES_URL
+  POSTGRES_USER:
+    name: hvc-auth-service-secrets
+    key: POSTGRES_USER
+  SECURITY_LOG_LEVEL:
+    name: hvc-auth-service-secrets
+    key: SECURITY_LOG_LEVEL
+  SMTP_HOST:
+    name: hvc-auth-service-secrets
+    key: SMTP_HOST
+  SMTP_PORT:
+    name: hvc-auth-service-secrets
+    key: SMTP_PORT
+  SMTP_USERNAME:
+    name: hvc-auth-service-secrets
+    key: SMTP_USERNAME
+  SMTP_PASSWORD:
+    name: hvc-auth-service-secrets
+    key: SMTP_PASSWORD
 emptyDir:
   enabled: false
 
