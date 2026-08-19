@@ -229,6 +229,9 @@ secretEnv:
   VAULT_TOKEN:
     name: hvc-auth-service-secrets
     key: VAULT_TOKEN
+  SERVER_PORT:
+    name: hvc-auth-service-secrets
+    key: SERVER_PORT
 emptyDir:
   enabled: false
 
