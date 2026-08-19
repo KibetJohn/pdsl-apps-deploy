@@ -225,8 +225,8 @@ secretEnv:
     key: SMTP_PASSWORD
   VAULT_ADDR:
     name: hvc-auth-service-secrets
-    key: VAULT_TOKEN
-  VAULT_ADDR:
+    key: VAULT_ADDR
+  VAULT_TOKEN:
     name: hvc-auth-service-secrets
     key: VAULT_TOKEN
 emptyDir:
