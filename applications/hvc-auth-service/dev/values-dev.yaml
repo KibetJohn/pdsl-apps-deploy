@@ -232,6 +232,9 @@ secretEnv:
   SERVER_PORT:
     name: hvc-auth-service-secrets
     key: SERVER_PORT
+  HVC_WORKFLOW_SERVICE_URL:
+    name: hvc-auth-service-secrets
+    key: HVC_WORKFLOW_SERVICE_URL
 emptyDir:
   enabled: false
 
