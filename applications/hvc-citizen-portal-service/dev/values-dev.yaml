@@ -172,6 +172,9 @@ secretEnv:
   DATABASE_HOST:
     name: database-creds
     key: db-host
+  KEYCLOAK_ADMIN_CLIENT_SECRET:
+    name: hvc-citizen-service-secrets
+    key: KEYCLOAK_ADMIN_CLIENT_SECRET
 
 emptyDir:
   enabled: false
