@@ -178,7 +178,7 @@ secretEnv:
   POSTGRES_USER:
     name: hvc-auth-service-secrets
     key: POSTGRES_USER
-  HVC_AUTH_SERVICE_URL
+  HVC_AUTH_SERVICE_URL:
     name: hvc-workflow-service-secrets
     key: HVC_AUTH_SERVICE_URL
 emptyDir:
