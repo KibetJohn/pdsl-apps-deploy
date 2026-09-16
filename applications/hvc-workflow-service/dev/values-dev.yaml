@@ -169,6 +169,15 @@ secretEnv:
   VAULT_TOKEN:
     name: hvc-auth-service-secrets
     key: VAULT_TOKEN
+  POSTGRES_PASSWORD:
+    name: hvc-auth-service-secrets
+    key: POSTGRES_PASSWORD
+  POSTGRES_URL:
+    name: hvc-auth-service-secrets
+    key: POSTGRES_URL
+  POSTGRES_USER:
+    name: hvc-auth-service-secrets
+    key: POSTGRES_USER
 emptyDir:
   enabled: false
 
